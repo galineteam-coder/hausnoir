@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Brain, Zap, Target, Sparkles } from "lucide-react";
+import { Brain, Zap, Target, Sparkles, LogOut, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Session } from "@supabase/supabase-js";
 import MicroGamesTest from "@/components/MicroGamesTest";
 import SkillProfile from "@/components/SkillProfile";
 
@@ -9,11 +12,30 @@ export interface SkillScores {
   reaction: number;
   pattern: number;
   memory: number;
+  spatial?: number;
+  verbal?: number;
+  multitask?: number;
 }
 
 const Index = () => {
   const [stage, setStage] = useState<"landing" | "testing" | "results">("landing");
   const [skillScores, setSkillScores] = useState<SkillScores | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+    });
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleTestComplete = (scores: SkillScores) => {
     setSkillScores(scores);
@@ -25,16 +47,54 @@ const Index = () => {
     setSkillScores(null);
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setStage("landing");
+    setSkillScores(null);
+  };
+
   if (stage === "testing") {
     return <MicroGamesTest onComplete={handleTestComplete} />;
   }
 
   if (stage === "results" && skillScores) {
-    return <SkillProfile scores={skillScores} onRestart={handleRestart} />;
+    return <SkillProfile scores={skillScores} onRestart={handleRestart} session={session} />;
   }
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
+      {/* Header with Auth */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex justify-end gap-2">
+          {session ? (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => navigate("/profile")}
+                className="gap-2"
+              >
+                <User className="w-4 h-4" />
+                Profile
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleLogout}
+                className="gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={() => navigate("/auth")}
+              className="bg-gradient-to-r from-primary to-secondary text-white"
+            >
+              Sign In
+            </Button>
+          )}
+        </div>
+      </div>
       {/* Hero Section */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 animate-pulse" />

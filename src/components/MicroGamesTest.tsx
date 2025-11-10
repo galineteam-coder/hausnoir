@@ -5,6 +5,9 @@ import { Progress } from "@/components/ui/progress";
 import ReactionGame from "./games/ReactionGame";
 import PatternGame from "./games/PatternGame";
 import MemoryGame from "./games/MemoryGame";
+import SpatialGame from "./games/SpatialGame";
+import VerbalGame from "./games/VerbalGame";
+import MultitaskGame from "./games/MultitaskGame";
 import { SkillScores } from "@/pages/Index";
 import { Sparkles } from "lucide-react";
 
@@ -12,7 +15,7 @@ interface MicroGamesTestProps {
   onComplete: (scores: SkillScores) => void;
 }
 
-type GameType = "intro" | "reaction" | "pattern" | "memory" | "processing";
+type GameType = "intro" | "reaction" | "pattern" | "memory" | "spatial" | "verbal" | "multitask" | "processing";
 
 const MicroGamesTest = ({ onComplete }: MicroGamesTestProps) => {
   const [currentGame, setCurrentGame] = useState<GameType>("intro");
@@ -20,10 +23,13 @@ const MicroGamesTest = ({ onComplete }: MicroGamesTestProps) => {
     reaction: 0,
     pattern: 0,
     memory: 0,
+    spatial: 0,
+    verbal: 0,
+    multitask: 0,
   });
   const [gameIndex, setGameIndex] = useState(0);
 
-  const games: GameType[] = ["intro", "reaction", "pattern", "memory", "processing"];
+  const games: GameType[] = ["intro", "reaction", "pattern", "memory", "spatial", "verbal", "multitask", "processing"];
   const progress = (gameIndex / (games.length - 1)) * 100;
 
   const handleGameComplete = (score: number) => {
@@ -35,6 +41,15 @@ const MicroGamesTest = ({ onComplete }: MicroGamesTestProps) => {
       nextGame();
     } else if (currentGame === "memory") {
       setScores((prev) => ({ ...prev, memory: score }));
+      nextGame();
+    } else if (currentGame === "spatial") {
+      setScores((prev) => ({ ...prev, spatial: score }));
+      nextGame();
+    } else if (currentGame === "verbal") {
+      setScores((prev) => ({ ...prev, verbal: score }));
+      nextGame();
+    } else if (currentGame === "multitask") {
+      setScores((prev) => ({ ...prev, multitask: score }));
       nextGame();
     }
   };
@@ -77,7 +92,7 @@ const MicroGamesTest = ({ onComplete }: MicroGamesTestProps) => {
               </div>
               <h2 className="text-3xl font-bold text-foreground">Let's Discover Your Skills!</h2>
               <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                You'll play 3 quick mini-games. There are no wrong answers — just be yourself and have fun!
+                You'll play 6 quick mini-games. There are no wrong answers — just be yourself and have fun!
               </p>
               <div className="space-y-3 text-left max-w-md mx-auto">
                 <div className="flex items-start gap-3">
@@ -106,6 +121,9 @@ const MicroGamesTest = ({ onComplete }: MicroGamesTestProps) => {
           {currentGame === "reaction" && <ReactionGame onComplete={handleGameComplete} />}
           {currentGame === "pattern" && <PatternGame onComplete={handleGameComplete} />}
           {currentGame === "memory" && <MemoryGame onComplete={handleGameComplete} />}
+          {currentGame === "spatial" && <SpatialGame onComplete={handleGameComplete} />}
+          {currentGame === "verbal" && <VerbalGame onComplete={handleGameComplete} />}
+          {currentGame === "multitask" && <MultitaskGame onComplete={handleGameComplete} />}
 
           {currentGame === "processing" && (
             <div className="text-center space-y-6 py-8">

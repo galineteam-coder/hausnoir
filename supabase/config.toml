@@ -1,1 +1,4 @@
 project_id = "yhrrtrfeywanipefjgkt"
+
+[functions.get-game-recommendations]
+verify_jwt = false

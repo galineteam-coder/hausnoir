@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
-import { ArrowLeft, Brain, Zap, Target, Box, BookOpen, Layers, Heart, Search, Filter } from "lucide-react";
+import { ArrowLeft, Brain, Zap, Target, Box, BookOpen, Layers, Heart, Search, Filter, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Leaderboard from "@/components/Leaderboard";
 import {
@@ -148,6 +148,32 @@ const Profile = () => {
     return Array.from(tags).sort();
   };
 
+  const handleShareProfile = async () => {
+    const latestTest = testResults[0];
+    const shareText = latestTest 
+      ? `Check out my Gaming DNA! I'm a ${latestTest.personality_type}! 🎮🧠`
+      : `Check out my Gaming DNA profile! 🎮🧠`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "My Gaming DNA Profile",
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch (error) {
+        // User cancelled or error occurred
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(`${shareText} ${window.location.href}`);
+      toast({
+        title: "Copied to clipboard!",
+        description: "Share your Gaming DNA profile with friends!",
+      });
+    }
+  };
+
   const handleRemoveFavorite = async (favoriteId: string) => {
     try {
       const { error } = await supabase
@@ -183,14 +209,27 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background p-4 py-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        <Button
-          variant="outline"
-          onClick={() => navigate("/")}
-          className="gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
-        </Button>
+        <div className="flex items-center justify-between gap-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/")}
+            className="gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Button>
+
+          {testResults.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={handleShareProfile}
+              className="gap-2"
+            >
+              <Share2 className="w-4 h-4" />
+              Share Profile
+            </Button>
+          )}
+        </div>
 
         <h1 className="text-4xl font-bold text-foreground">Your Profile</h1>
 

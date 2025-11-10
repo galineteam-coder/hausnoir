@@ -238,11 +238,83 @@ const SkillProfile = ({ scores, onRestart, session }: SkillProfileProps) => {
       return;
     }
 
-    // In a real implementation, you'd find the game ID first
-    toast({
-      title: "Feature coming soon!",
-      description: "Game favorites will be available soon.",
-    });
+    try {
+      // Find or create the game
+      const { data: existingGame, error: findError } = await supabase
+        .from("games")
+        .select("id")
+        .eq("title", gameTitle)
+        .maybeSingle();
+
+      if (findError) throw findError;
+
+      let gameId = existingGame?.id;
+
+      // If game doesn't exist, create it
+      if (!gameId) {
+        const gameData = recommendedGames.find(g => g.title === gameTitle);
+        if (!gameData) return;
+
+        const { data: newGame, error: createError } = await supabase
+          .from("games")
+          .insert({
+            title: gameData.title,
+            description: gameData.description,
+            tags: gameData.tags,
+            cognitive_profile: {},
+          })
+          .select("id")
+          .single();
+
+        if (createError) throw createError;
+        gameId = newGame.id;
+      }
+
+      // Check if already favorited
+      const { data: existingFav } = await supabase
+        .from("user_favorites")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .eq("game_id", gameId)
+        .maybeSingle();
+
+      if (existingFav) {
+        // Remove from favorites
+        const { error: deleteError } = await supabase
+          .from("user_favorites")
+          .delete()
+          .eq("id", existingFav.id);
+
+        if (deleteError) throw deleteError;
+
+        toast({
+          title: "Removed from favorites",
+          description: `${gameTitle} has been removed from your favorites`,
+        });
+      } else {
+        // Add to favorites
+        const { error: insertError } = await supabase
+          .from("user_favorites")
+          .insert({
+            user_id: session.user.id,
+            game_id: gameId,
+          });
+
+        if (insertError) throw insertError;
+
+        toast({
+          title: "Added to favorites!",
+          description: `${gameTitle} has been added to your favorites`,
+        });
+      }
+    } catch (error) {
+      console.error("Error saving favorite:", error);
+      toast({
+        title: "Error",
+        description: "Could not save favorite",
+        variant: "destructive",
+      });
+    }
   };
 
   const personality = getPersonalityType();

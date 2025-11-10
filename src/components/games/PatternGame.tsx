@@ -12,22 +12,34 @@ const PatternGame = ({ onComplete }: PatternGameProps) => {
   const [userPattern, setUserPattern] = useState<number[]>([]);
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
-  const maxRounds = 4;
+  const [currentShowIndex, setCurrentShowIndex] = useState(0);
+  const maxRounds = 5;
 
   const generatePattern = (length: number) => {
-    return Array.from({ length }, () => Math.floor(Math.random() * 9));
+    return Array.from({ length }, () => Math.floor(Math.random() * 16));
   };
 
   const startRound = () => {
-    const newPattern = generatePattern(round + 2); // Start with 3, increase each round
+    const patternLength = round + 3; // Start with 4, increase each round
+    const newPattern = generatePattern(patternLength);
     setPattern(newPattern);
     setUserPattern([]);
+    setCurrentShowIndex(0);
     setStage("showing");
-
-    setTimeout(() => {
-      setStage("playing");
-    }, (newPattern.length + 1) * 600);
   };
+
+  useEffect(() => {
+    if (stage === "showing" && currentShowIndex < pattern.length) {
+      const timer = setTimeout(() => {
+        setCurrentShowIndex(currentShowIndex + 1);
+      }, 700);
+      return () => clearTimeout(timer);
+    } else if (stage === "showing" && currentShowIndex >= pattern.length) {
+      setTimeout(() => {
+        setStage("playing");
+      }, 500);
+    }
+  }, [stage, currentShowIndex, pattern.length]);
 
   const handleCellClick = (index: number) => {
     if (stage !== "playing") return;
@@ -35,9 +47,23 @@ const PatternGame = ({ onComplete }: PatternGameProps) => {
     const newUserPattern = [...userPattern, index];
     setUserPattern(newUserPattern);
 
+    // Check if current click is wrong
+    const currentIndex = newUserPattern.length - 1;
+    if (newUserPattern[currentIndex] !== pattern[currentIndex]) {
+      // Wrong click - no points for this round
+      if (round >= maxRounds) {
+        setStage("results");
+        setTimeout(() => onComplete(score), 1500);
+      } else {
+        setRound(round + 1);
+        setTimeout(startRound, 1000);
+      }
+      return;
+    }
+
+    // Check if pattern completed successfully
     if (newUserPattern.length === pattern.length) {
-      const correct = pattern.every((val, i) => val === newUserPattern[i]);
-      const newScore = score + (correct ? 25 : 0);
+      const newScore = score + 20;
       setScore(newScore);
 
       if (round >= maxRounds) {
@@ -45,7 +71,7 @@ const PatternGame = ({ onComplete }: PatternGameProps) => {
         setTimeout(() => onComplete(newScore), 1500);
       } else {
         setRound(round + 1);
-        setTimeout(startRound, 1500);
+        setTimeout(startRound, 1000);
       }
     }
   };
@@ -74,23 +100,30 @@ const PatternGame = ({ onComplete }: PatternGameProps) => {
       {(stage === "showing" || stage === "playing") && (
         <div className="space-y-4">
           <p className="text-lg font-semibold text-foreground">
-            {stage === "showing" ? "Watch carefully..." : "Now you try!"}
+            {stage === "showing" ? "Watch carefully..." : "Repeat the pattern!"}
           </p>
-          <p className="text-sm text-muted-foreground">Round {round} of {maxRounds}</p>
-          <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
-            {Array.from({ length: 9 }).map((_, index) => {
-              const isShowing = stage === "showing" && pattern[userPattern.length] === index;
+          <p className="text-sm text-muted-foreground">
+            Round {round} of {maxRounds} • Pattern length: {pattern.length}
+          </p>
+          <div className="grid grid-cols-4 gap-2 max-w-sm mx-auto">
+            {Array.from({ length: 16 }).map((_, index) => {
+              const isCurrentlyShowing = stage === "showing" && currentShowIndex > 0 && pattern[currentShowIndex - 1] === index;
               const wasClicked = userPattern.includes(index);
+              const isCorrectClick = wasClicked && userPattern.indexOf(index) < pattern.length && pattern[userPattern.indexOf(index)] === index;
+              const isWrongClick = wasClicked && !isCorrectClick;
+              
               return (
                 <button
                   key={index}
                   onClick={() => handleCellClick(index)}
                   disabled={stage === "showing"}
-                  className={`aspect-square rounded-xl transition-all duration-300 ${
-                    isShowing
+                  className={`aspect-square rounded-lg transition-all duration-200 ${
+                    isCurrentlyShowing
                       ? "bg-gradient-to-br from-secondary to-secondary/70 scale-110 shadow-lg"
-                      : wasClicked
-                      ? "bg-primary/40 scale-95"
+                      : isWrongClick
+                      ? "bg-red-500/60 scale-95"
+                      : isCorrectClick
+                      ? "bg-green-500/40 scale-95"
                       : "bg-muted hover:bg-primary/20"
                   } ${stage === "playing" ? "cursor-pointer" : "cursor-not-allowed"}`}
                 />

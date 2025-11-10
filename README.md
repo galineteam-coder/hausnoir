@@ -1,73 +1,23 @@
-# Welcome to your Lovable project
+Haus Noir — Cognitive Game Profiling for Modern Players
 
-## Project info
+Haus Noir is a tech-modern play-profiling engine built to rethink how players discover games. Traditional stores rely on genres, tags, or sales charts — signals that flatten individuality and bury smaller, soulful titles under algorithms. Haus Noir takes a different approach: it learns you.
 
-**URL**: https://lovable.dev/projects/e07e9a39-3995-48a1-b398-c9048d1e1c1b
+At the core of Haus Noir is a series of minimal, elegant micro-challenges that capture how you think and react. These tests measure cognitive patterns such as reflex speed, strategic planning, adaptability, risk sensitivity, focus depth, and problem-solving style. Every interaction feeds a lightweight behavioral model that generates your Cognitive Signature — a unique profile that describes your natural play tendencies with clarity and nuance.
 
-## How can I edit this code?
+Using this signature, Haus Noir matches players with games that align with their inherent instincts rather than superficial categories. A fast, decisive thinker receives different recommendations than a slow, methodical strategist. Explorers discover titles built around discovery and narrative texture, while pattern-hunters get deep systems, roguelikes, and progression loops.
 
-There are several ways of editing your application.
+Behind the scenes, Haus Noir integrates modern embeddings, TasteRay signals, and store APIs to pull accurate metadata from Steam, Epic, and other libraries. The system merges your personal cognitive fingerprint with real game mechanics, creating a recommendation layer that feels intentional and human — not statistical or generic.
 
-**Use Lovable**
+The experience is designed to feel premium and effortless:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e07e9a39-3995-48a1-b398-c9048d1e1c1b) and start prompting.
+A clean, modern UI that behaves like a design object rather than a store.
 
-Changes made via Lovable will be committed automatically to this repo.
+Interactive visualizations of your Cognitive Signature.
 
-**Use your preferred IDE**
+A discovery feed that changes dynamically as your profile evolves.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+“Why This Game?” cards that explain matches in transparent, relatable terms.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Haus Noir is not just a discovery tool — it’s a mirror. It helps you understand the kind of player you are, and it opens paths to games you might never have found on your own. In a world overwhelmed by content, Haus Noir brings precision, personality, and a sense of quiet sophistication to the way we play.
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/e07e9a39-3995-48a1-b398-c9048d1e1c1b) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+More than recommendation — this is self-discovery through gameplay.

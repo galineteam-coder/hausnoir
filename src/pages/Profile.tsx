@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { ArrowLeft, Brain, Zap, Target, Box, BookOpen, Layers, Heart, Search, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import Leaderboard from "@/components/Leaderboard";
 import {
   Select,
   SelectContent,
@@ -15,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+const Leaderboard = lazy(() => import("@/components/Leaderboard"));
 
 interface TestResult {
   id: string;
@@ -258,7 +259,13 @@ const Profile = () => {
         </div>
 
         {/* Leaderboards */}
-        <Leaderboard />
+        <Suspense fallback={
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        }>
+          <Leaderboard />
+        </Suspense>
 
         {/* Favorite Games */}
         <div className="space-y-4">

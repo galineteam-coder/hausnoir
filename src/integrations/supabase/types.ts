@@ -50,6 +50,33 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard: {
+        Row: {
+          created_at: string
+          game_type: string
+          id: string
+          score: number
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          game_type: string
+          id?: string
+          score: number
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          game_type?: string
+          id?: string
+          score?: number
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

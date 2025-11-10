@@ -2,10 +2,19 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
-import { ArrowLeft, Brain, Zap, Target, Box, BookOpen, Layers, Heart } from "lucide-react";
+import { ArrowLeft, Brain, Zap, Target, Box, BookOpen, Layers, Heart, Search, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Leaderboard from "@/components/Leaderboard";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TestResult {
   id: string;
@@ -33,6 +42,9 @@ const Profile = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [favorites, setFavorites] = useState<FavoriteGame[]>([]);
+  const [filteredFavorites, setFilteredFavorites] = useState<FavoriteGame[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTag, setSelectedTag] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -93,6 +105,7 @@ const Profile = () => {
 
       if (favsError) throw favsError;
       setFavorites(favs || []);
+      setFilteredFavorites(favs || []);
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast({
@@ -103,6 +116,36 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    let filtered = favorites;
+
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (fav) =>
+          fav.games.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          fav.games.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Filter by tag
+    if (selectedTag !== "all") {
+      filtered = filtered.filter((fav) =>
+        fav.games.tags.includes(selectedTag)
+      );
+    }
+
+    setFilteredFavorites(filtered);
+  }, [searchQuery, selectedTag, favorites]);
+
+  const getAllTags = () => {
+    const tags = new Set<string>();
+    favorites.forEach((fav) => {
+      fav.games.tags.forEach((tag) => tags.add(tag));
+    });
+    return Array.from(tags).sort();
   };
 
   const handleRemoveFavorite = async (favoriteId: string) => {
@@ -214,16 +257,55 @@ const Profile = () => {
           )}
         </div>
 
+        {/* Leaderboards */}
+        <Leaderboard />
+
         {/* Favorite Games */}
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">Favorite Games</h2>
+          
           {favorites.length === 0 ? (
             <Card className="p-8 text-center">
               <p className="text-muted-foreground">No favorite games yet</p>
             </Card>
           ) : (
-            <div className="grid md:grid-cols-2 gap-4">
-              {favorites.map((fav) => (
+            <>
+              {/* Search and Filter */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search games..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select value={selectedTag} onValueChange={setSelectedTag}>
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Filter by tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tags</SelectItem>
+                    {getAllTags().map((tag) => (
+                      <SelectItem key={tag} value={tag}>
+                        {tag}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Games Grid */}
+              {filteredFavorites.length === 0 ? (
+                <Card className="p-8 text-center">
+                  <p className="text-muted-foreground">No games match your search</p>
+                </Card>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-4">
+                  {filteredFavorites.map((fav) => (
                 <Card key={fav.id} className="p-6 bg-gradient-to-b from-card to-card/50 border-2 border-primary/20">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-bold text-foreground">{fav.games.title}</h3>
@@ -250,6 +332,8 @@ const Profile = () => {
                 </Card>
               ))}
             </div>
+              )}
+            </>
           )}
         </div>
       </div>

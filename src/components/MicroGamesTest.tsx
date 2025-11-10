@@ -10,6 +10,7 @@ import VerbalGame from "./games/VerbalGame";
 import MultitaskGame from "./games/MultitaskGame";
 import { SkillScores } from "@/pages/Index";
 import { Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MicroGamesTestProps {
   onComplete: (scores: SkillScores) => void;
@@ -32,24 +33,52 @@ const MicroGamesTest = ({ onComplete }: MicroGamesTestProps) => {
   const games: GameType[] = ["intro", "reaction", "pattern", "memory", "spatial", "verbal", "multitask", "processing"];
   const progress = (gameIndex / (games.length - 1)) * 100;
 
+  const saveScoreToLeaderboard = async (gameType: string, score: number) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      await supabase.from("leaderboard").insert({
+        user_id: user.id,
+        game_type: gameType,
+        score: score,
+        username: profile?.username || "Anonymous",
+      });
+    } catch (error) {
+      console.error("Error saving score to leaderboard:", error);
+    }
+  };
+
   const handleGameComplete = (score: number) => {
     if (currentGame === "reaction") {
       setScores((prev) => ({ ...prev, reaction: score }));
+      saveScoreToLeaderboard("reaction", score);
       nextGame();
     } else if (currentGame === "pattern") {
       setScores((prev) => ({ ...prev, pattern: score }));
+      saveScoreToLeaderboard("pattern", score);
       nextGame();
     } else if (currentGame === "memory") {
       setScores((prev) => ({ ...prev, memory: score }));
+      saveScoreToLeaderboard("memory", score);
       nextGame();
     } else if (currentGame === "spatial") {
       setScores((prev) => ({ ...prev, spatial: score }));
+      saveScoreToLeaderboard("spatial", score);
       nextGame();
     } else if (currentGame === "verbal") {
       setScores((prev) => ({ ...prev, verbal: score }));
+      saveScoreToLeaderboard("verbal", score);
       nextGame();
     } else if (currentGame === "multitask") {
       setScores((prev) => ({ ...prev, multitask: score }));
+      saveScoreToLeaderboard("multitask", score);
       nextGame();
     }
   };

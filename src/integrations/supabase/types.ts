@@ -14,7 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      games: {
+        Row: {
+          cognitive_profile: Json
+          created_at: string
+          description: string
+          external_id: string | null
+          id: string
+          image_url: string | null
+          match_score: number | null
+          tags: string[]
+          title: string
+        }
+        Insert: {
+          cognitive_profile?: Json
+          created_at?: string
+          description: string
+          external_id?: string | null
+          id?: string
+          image_url?: string | null
+          match_score?: number | null
+          tags?: string[]
+          title: string
+        }
+        Update: {
+          cognitive_profile?: Json
+          created_at?: string
+          description?: string
+          external_id?: string | null
+          id?: string
+          image_url?: string | null
+          match_score?: number | null
+          tags?: string[]
+          title?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      skill_tests: {
+        Row: {
+          created_at: string
+          id: string
+          memory_score: number
+          multitask_score: number | null
+          pattern_score: number
+          personality_type: string
+          reaction_score: number
+          spatial_score: number | null
+          user_id: string
+          verbal_score: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          memory_score: number
+          multitask_score?: number | null
+          pattern_score: number
+          personality_type: string
+          reaction_score: number
+          spatial_score?: number | null
+          user_id: string
+          verbal_score?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          memory_score?: number
+          multitask_score?: number | null
+          pattern_score?: number
+          personality_type?: string
+          reaction_score?: number
+          spatial_score?: number | null
+          user_id?: string
+          verbal_score?: number | null
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

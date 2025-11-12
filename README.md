@@ -1,3 +1,5 @@
+Try Haus Noir here: https://hausnoir.lovable.app
+
 Haus Noir — Cognitive Game Profiling for Modern Players
 
 Haus Noir is a tech-modern play-profiling engine built to rethink how players discover games. Traditional stores rely on genres, tags, or sales charts — signals that flatten individuality and bury smaller, soulful titles under algorithms. Haus Noir takes a different approach: it learns you.
